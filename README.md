@@ -2,7 +2,16 @@
 
 A standalone embedded system that lets elderly or bedridden patients signal their needs to a caretaker with a single push button. It's built on the TI TM4C123GH6PM (ARM Cortex-M4) in Embedded C with Keil uVision, and tested on real hardware.
 
-![Hardware results](images/results.jpg)
+<p align="center">
+  <img src="images/WhatsApp%20Image%202026-11-22%20at%2012.47.23%20A.jpeg" width="32%" alt="Hardware test photo">
+  <img src="images/WhatsApp%20Image%202026-11-22%20at%2012.47.23%20AM.jpeg" width="32%" alt="Hardware test photo">
+  <img src="images/WhatsApp%20Image%202026-11-22%20at%2012.47.24%20AM.jpeg" width="32%" alt="Hardware test photo">
+  <img src="images/WhatsApp%20Image%202026-11-22%20at%2012.47.25%20.jpeg" width="32%" alt="Hardware test photo">
+  <img src="images/WhatsApp%20Image%202026-11-22%20at%2012.47.25%20AM.jpeg" width="32%" alt="Hardware test photo">
+  <img src="images/WhatsApp%20Image%202026-11-22%20at%2012.47.26%20.jpeg" width="32%" alt="Hardware test photo">
+</p>
+
+*Photos from hardware testing on the TM4C123 LaunchPad trainer kit: system ready, water and food requests, emergency alert and emergency attended.*
 
 ## Features
 
