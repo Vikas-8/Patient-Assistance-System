@@ -1,86 +1,58 @@
-# Real-Time Patient Assistance and Caretaker Notification System
+# Real-Time Patient Assistance and Caretaker Notification System (ARM Cortex-M4)
 
-## Project Overview
+A standalone embedded system that lets elderly or bedridden patients signal their needs to a caretaker with a single push button. It's built on the TI TM4C123GH6PM (ARM Cortex-M4) in Embedded C with Keil uVision, and tested on real hardware.
 
-This project focuses on developing a real-time patient assistance system using the ARM Cortex-M4 based TM4C123GH6PM microcontroller.
+![Hardware results](images/results.jpg)
 
-The system enables patients, particularly elderly and physically weak individuals, to communicate their basic needs to caretakers through a simple push-button interface. It identifies patient requests based on the number of button presses and provides visual and audible notifications.
+## Features
 
-An emergency switch is also integrated to generate priority alerts for immediate caretaker attention.
+- **Multi-press requests on one button:** 1 press = water, 2 presses = food, 3 or more = medicine
+- **16x2 LCD** shows the request and the system status
+- **Buzzer alert** for every new request
+- **Reminder alerts.** The buzzer repeats every 5 seconds until the caretaker acknowledges the request.
+- **Emergency mode.** The LED turns on, the LCD shows `EMERGENCY!!! / CALL NURSE`, and the buzzer beeps continuously until the emergency is attended.
+- **Caretaker acknowledgement**, which returns the system to standby
 
-## Key Features
+## How it works
 
-- Single-button multi-press detection.
-- Water, food and medicine request identification.
-- 16×2 LCD display for request information.
-- Buzzer-based caretaker notifications.
-- Emergency switch with priority alert.
-- LED-based emergency indication.
-- Caretaker acknowledgement mechanism.
-- Automatic reminder alerts for unattended requests.
+1. On power-up, the LCD shows `PATIENT CARE / SYSTEM READY`.
+2. **Patient request (SW1).** The controller counts presses until 4 seconds pass with no new press, then shows `PATIENT NEED` with WATER, FOOD or MEDICINE and sounds the buzzer.
+3. **Acknowledge (SW2).** The caretaker presses SW2, the LCD shows `REQUEST ATTENDED`, and the system returns to standby. Until then, the buzzer repeats every 5 seconds.
+4. **Emergency (SW2 in standby).** The LED and continuous buzzer turn on. Pressing SW1 stops the alarm and shows `EMERGENCY ATTENDED`.
 
-## Hardware Components
+## Hardware and pin connections
 
-- TM4C123GH6PM ARM Cortex-M4 microcontroller.
-- 16×2 LCD display (JHD162A).
-- 74HC595 shift register.
-- Push buttons and emergency switch.
-- Piezo buzzer.
-- LED indicators.
-
-## Working Principle
-
-The system continuously monitors the patient request button.
-
-| Button Presses | Patient Request |
+| Function | TM4C123GH6PM pin |
 |---|---|
-| 1 Press | Water |
-| 2 Presses | Food |
-| 3 or more Presses | Medicine |
+| SW1: patient request / stop emergency | PF4 (onboard switch, internal pull-up) |
+| SW2: emergency / caretaker acknowledge | PF0 (onboard switch, unlocked, internal pull-up) |
+| Status LED | PF2 |
+| Buzzer | PB3 |
+| LCD shift register: serial data / clock | PF2 / PF3 |
+| LCD shift register: latch | PE5 |
 
-The selected request is displayed on the LCD, and the buzzer notifies the caretaker.
+The 16x2 LCD runs in 4-bit mode and is driven through an 8-bit shift register on the ARM Cortex-M4 trainer kit, which saves GPIO pins. The LCD nibble bits are remapped in software to match the board wiring. Delays use the SysTick timer at the default 16 MHz clock.
 
-If the request is not acknowledged within the configured time, the system generates reminder alerts.
+## Software
 
-The emergency switch activates a priority alert using continuous buzzer and LED indications until the emergency is attended and cleared.
+| Function | Purpose |
+|---|---|
+| `PortF_Init`, `PortB_Init`, `PortE_Init` | GPIO setup for the switches, LED, buzzer and LCD shift register |
+| `LCD_init`, `LCD_command`, `LCD_putc`, `LCD_puts` | 4-bit LCD driver over the shift register |
+| `shift_out1` | Bit-bangs one byte into the shift register and latches it |
+| `Count_Presses` | Debounced multi-press counter with a 4 s timeout |
+| `buzzer_short` | 500 ms buzzer beep |
+| `delayMs` | Millisecond delay using SysTick |
 
-## Software and Technologies
+## Build and run
 
-- Embedded C
-- ARM Cortex-M4
-- TM4C123GH6PM
-- Keil µVision
-- GPIO Interfacing
-- LCD Interfacing
-- Shift Register Communication
-- SysTick Timer
+1. Create a Keil uVision project for the **TM4C123GH6PM** and add `src/main.c`. The project also needs the `tm4c123gh6pm.h` header from the TivaWare / Keil device pack.
+2. Build it and flash it to the TM4C123 LaunchPad.
+3. Press SW1 once, twice or three times to send a request, SW2 to acknowledge, and SW2 from standby to trigger an emergency.
 
-## Testing and Results
+## Notes and future work
 
-The system was evaluated under different operating conditions, including:
+- PF2 drives both the LED and the shift register's serial data line, so the LED flickers while the LCD updates.
+- Possible next steps: GSM or Wi-Fi notifications to the caretaker's phone, more request types, and health sensors such as pulse and temperature.
 
-- Standby operation.
-- Water request detection.
-- Food request detection.
-- Medicine request detection.
-- Emergency alert activation.
-- Caretaker acknowledgement.
-
-## Applications
-
-- Patient assistance systems.
-- Elderly care environments.
-- Hospital patient notification systems.
-- Assisted living facilities.
-
-## Future Scope
-
-- Wireless notification to caretakers.
-- Mobile application integration.
-- IoT-based remote monitoring.
-- Additional patient monitoring sensors.
-- Improved power management.
-
-## Conclusion
-
-The project demonstrates an embedded patient assistance solution using ARM Cortex-M4, providing a simple interface for patient requests and emergency notifications to caretakers.
+Team project for the Embedded Systems course at Amrita Vishwa Vidyapeetham, Amritapuri (May 2026).
